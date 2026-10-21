@@ -1,0 +1,15 @@
+{
+  "name": "frp-client-manager",
+  "version": "1.0.0",
+  "description": "FRP 客户端管理平台 - Web 管理 frpc 映射，热加载即时生效，支持多服务端",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "license": "MIT"
+}

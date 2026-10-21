@@ -1,0 +1,25 @@
+# 依赖
+node_modules/
+
+# 运行时数据（SQLite / 渲染配置 / 日志）
+data/
+*.db
+*.db-wal
+*.db-shm
+*.log
+
+# 密钥与本地配置
+.env
+*.pem
+*.key
+
+# 运维脚本与凭据（不入库）
+服务器信息/
+
+# 编辑器 / OS
+.DS_Store
+.vscode/
+.idea/
+
+# AI 工具记忆
+.codebuddy/

@@ -1,0 +1,18 @@
+services:
+  frp-manager:
+    build: ./server
+    image: frp-client-manager:latest
+    container_name: frp-client-manager
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - MANAGER_USER=admin
+      - MANAGER_PASSWORD=admin123
+      # 若容器内能找到 frpc 二进制则启用真实热加载；否则进入 config-only 模式（仅管理配置）
+      - FRPC_BIN=/usr/local/bin/frpc
+    volumes:
+      - ./data:/data
+      # 可选：挂载真实 frpc 二进制以启用热加载
+      # - /usr/local/bin/frpc:/usr/local/bin/frpc:ro
+    restart: unless-stopped
