@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FRP 客户端管理平台</title>
+<link rel="icon" id="siteIcon" href="data:," />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="loading">加载中…</div>
+<div class="app" id="app" style="visibility:hidden">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo" id="sideLogo">FRP</div><div class="brand-txt"><b id="sideName">FRP 客户端管理平台</b><span>管理控制台</span></div></div>
+    <div class="nav-item active" data-view="overview">概览<span class="badge" id="navProxyCount">0</span></div>
+    <div class="nav-item" data-view="servers" data-role="admin">服务端实例<span class="badge" id="navServerCount">0</span></div>
+    <div class="nav-item" data-view="proxies">映射管理<span class="badge" id="navProxyCount2">0</span></div>
+    <div class="nav-item" data-view="config">配置预览</div>
+    <div class="nav-item" data-view="logs">日志与审计</div>
+    <div class="nav-item" data-view="users" data-role="admin">用户管理</div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div><h1 id="pageTitle">概览</h1><div class="sub" id="pageSub"></div></div>
+      <div class="top-actions">
+        <span class="chip"><i class="dot ok"></i> <span id="chipRunning">0</span> 实例运行中</span>
+        <button class="btn ghost sm" id="btnTheme">切换主题</button>
+        <button class="btn primary" id="btnNewProxy">+ 新增映射</button>
+        <div class="user-menu" id="userMenu">
+          <div class="avatar" id="avatarBtn" title="账户"></div>
+          <div class="me-menu" id="meMenu">
+            <div class="me-head" id="meHead"></div>
+            <div class="me-item" data-act="change-pwd">修改密码</div>
+            <div class="me-item" data-act="branding" data-role="admin">平台设置</div>
+            <div class="me-item danger" data-act="logout">退出登录</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<div class="mask" id="mask"></div>
+<div class="drawer" id="drawer"><div class="drawer-h"><h3 id="drawerTitle">新增映射</h3><button class="x" data-close>×</button></div><div class="drawer-b" id="drawerBody"></div><div class="drawer-f"><button class="btn" data-close>取消</button><div style="flex:1"></div><button class="btn primary" id="btnSaveProxy">保存并热加载</button></div></div>
+<div class="modal narrow" id="serverModal"><div class="drawer-h"><h3 id="smTitle">新增服务端</h3><button class="x" data-close>×</button></div><div class="drawer-b" id="smBody"></div><div class="drawer-f"><button class="btn" data-close>取消</button><div style="flex:1"></div><button class="btn primary" id="btnSaveServer">保存</button></div></div>
+<div class="modal narrow" id="pipeModal"><div class="drawer-h"><h3 id="pipeTitle">正在热加载</h3></div><div class="drawer-b"><div style="font-size:13px;color:var(--text-2);margin-bottom:6px" id="pipeDesc"></div><div class="steps" id="pipeSteps"></div></div><div class="drawer-f" id="pipeFoot"></div></div>
+<div class="modal narrow" id="ioModal"><div class="drawer-h"><h3>导入映射</h3><button class="x" data-close>×</button></div><div class="drawer-b" id="ioBody"></div><div class="drawer-f"><button class="btn" data-close>取消</button><div style="flex:1"></div><button class="btn primary" id="btnDoImport">解析并导入</button></div></div>
+<div class="modal narrow" id="logModal"><div class="drawer-h"><h3 id="logTitle">frpc 运行日志</h3><button class="x" data-close>×</button></div><div class="drawer-b"><pre class="code" id="logBody" style="max-height:440px;white-space:pre-wrap"></pre></div><div class="drawer-f"><div style="flex:1"></div><button class="btn primary" data-close>关闭</button></div></div>
+
+<div class="modal narrow" id="pwdModal"><div class="drawer-h"><h3>修改密码</h3><button class="x" data-close>×</button></div><div class="drawer-b">
+  <div class="field"><label>当前密码</label><input type="password" id="pwOld" autocomplete="current-password" placeholder="请输入当前密码" /></div>
+  <div class="field"><label>新密码</label><input type="password" id="pwNew" autocomplete="new-password" placeholder="请输入新密码" /><div class="hint">长度至少 6 位</div></div>
+  <div class="field"><label>确认新密码</label><input type="password" id="pwNew2" autocomplete="new-password" placeholder="请再次输入新密码" /></div>
+  <div class="err" id="pwErr"></div>
+</div><div class="drawer-f"><button class="btn" data-close>取消</button><div style="flex:1"></div><button class="btn primary" id="btnSavePwd">保存</button></div></div>
+
+<div class="modal narrow" id="setPwdModal"><div class="drawer-h"><h3 id="spTitle">修改密码</h3><button class="x" data-close>×</button></div><div class="drawer-b">
+  <div class="field"><label>新密码</label><input type="password" id="spNew" autocomplete="new-password" placeholder="请输入新密码" /><div class="hint">直接为该账号设置新密码，长度至少 6 位</div></div>
+  <div class="field"><label>确认新密码</label><input type="password" id="spNew2" autocomplete="new-password" placeholder="请再次输入新密码" /></div>
+  <div class="err" id="spErr"></div>
+</div><div class="drawer-f"><button class="btn" data-close>取消</button><div style="flex:1"></div><button class="btn primary" id="btnSaveSetPwd">保存</button></div></div>
+
+<div class="modal narrow" id="userModal"><div class="drawer-h"><h3>新增用户</h3><button class="x" data-close>×</button></div><div class="drawer-b">
+  <div class="field"><label>账号</label><input type="text" id="nuUser" autocomplete="off" placeholder="请输入账号" /></div>
+  <div class="field"><label>密码</label><input type="password" id="nuPass" autocomplete="new-password" placeholder="请输入初始密码" /><div class="hint">长度至少 6 位</div></div>
+  <div class="field"><label>角色</label><select id="nuRole"><option value="user">普通用户</option><option value="admin">管理员</option></select></div>
+  <div class="field"><label>备注</label><input type="text" id="nuRemark" placeholder="可选" /></div>
+  <div class="err" id="nuErr"></div>
+</div><div class="drawer-f"><button class="btn" data-close>取消</button><div style="flex:1"></div><button class="btn primary" id="btnSaveUser">创建</button></div></div>
+
+<div class="modal narrow" id="brandModal"><div class="drawer-h"><h3>平台设置</h3><button class="x" data-close>×</button></div><div class="drawer-b">
+  <div class="field"><label>平台名称</label><input type="text" id="brName" placeholder="FRP 客户端管理平台" /></div>
+  <div class="field"><label>Logo 文字</label><input type="text" id="brShort" maxlength="8" placeholder="FRP" /><div class="hint">未设置 Logo 图片时显示，建议 2–4 个字符</div></div>
+  <div class="field"><label>Logo 图片 URL</label><input type="text" id="brLogo" placeholder="留空则使用上面的文字" /><div class="hint">支持 http(s) 图片链接或 data:image/... 内嵌图片</div></div>
+  <div class="field"><label>站点图标（favicon）URL</label><input type="text" id="brIcon" placeholder="留空使用默认图标" /></div>
+  <div class="brand-preview"><div class="logo" id="brPrevLogo">FRP</div><b id="brPrevName">FRP 客户端管理平台</b></div>
+  <div class="err" id="brErr"></div>
+</div><div class="drawer-f"><button class="btn" data-close>取消</button><div style="flex:1"></div><button class="btn primary" id="btnSaveBrand">保存</button></div></div>
+
+<div class="login-wrap show" id="loginWrap">
+  <form class="login" id="loginForm" autocomplete="off">
+    <div class="head"><div class="logo" id="loginLogo">FRP</div><div class="brand-txt"><b id="loginName">FRP 客户端管理平台</b></div></div>
+    <div class="field"><label>账号</label><input type="text" id="liUser" placeholder="请输入账号" autocomplete="username" /></div>
+    <div class="field"><label>密码</label><input type="password" id="liPass" placeholder="请输入密码" autocomplete="current-password" /></div>
+    <div class="err" id="liErr"></div>
+    <button class="btn primary" style="width:100%;justify-content:center;padding:10px" type="submit">登 录</button>
+  </form>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+<script src="app.js"></script>
+</body>
+</html>
