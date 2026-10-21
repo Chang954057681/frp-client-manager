@@ -3,7 +3,6 @@
 基于 [fatedier/frp](https://github.com/fatedier/frp) 的 **Web 管理平台**：在浏览器中维护多个 frpc 服务端连接与映射，
 保存后通过 frpc 的 Admin API（ `GET /api/reload` ）**即时热加载生效，无需重启客户端进程**。
 
-完整设计方案见 [`docs/frp-client-platform-design.md`](docs/frp-client-platform-design.md)；纯前端交互原型见 [`demo/index.html`](demo/index.html)。
 
 ## 架构
 
