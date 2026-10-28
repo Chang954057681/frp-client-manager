@@ -16,7 +16,7 @@ function renderCommon(s) {
   L.push('auth.token = "' + (s.token || '') + '"');
   L.push('');
   L.push('transport.protocol = "' + s.protocol + '"');
-  L.push('transport.tcpMux = ' + (s.tls ? 'true' : 'false'));
+  L.push('transport.tcpMux = ' + (s.mux ? 'true' : 'false'));
   L.push('transport.tls.enable = ' + (s.tls ? 'true' : 'false'));
   L.push('transport.heartbeatInterval = 30');
   L.push('');
@@ -34,7 +34,8 @@ function renderCommon(s) {
 function renderProxy(p) {
   const L = ['[[proxies]]', 'name = "' + p.name + '"', 'type = "' + p.type + '"',
     'localIP = "' + p.local_ip + '"', 'localPort = ' + (p.local_port || 0)];
-  if (p.remote_port) L.push('remotePort = ' + p.remote_port);
+  // remotePort 仅 tcp/udp 支持；http/https/tcpmux/stcp/xtcp 等无此字段
+  if ((p.type === 'tcp' || p.type === 'udp') && p.remote_port) L.push('remotePort = ' + p.remote_port);
   if (p.subdomain) L.push('subdomain = "' + p.subdomain + '"');
   if (p.domains) {
     const arr = String(p.domains).split(/[,\s]+/).filter(Boolean).map(d => '"' + d + '"');
